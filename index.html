@@ -112,6 +112,23 @@ body {
 
 		<script src="index.js"></script>
 		<script>
+// Unlock AudioContext on first user interaction (fixes no-sound on revisit)
+(function() {
+	const unlock = function() {
+		if (window.GodotAudio && window.GodotAudio.ctx && window.GodotAudio.ctx.state === 'suspended') {
+			window.GodotAudio.ctx.resume();
+		}
+		const allCtx = window.AudioContext || window.webkitAudioContext;
+		if (allCtx) {
+			document.querySelectorAll('audio').forEach(a => a.play().catch(()=>{}));
+		}
+		document.removeEventListener('click', unlock);
+		document.removeEventListener('touchstart', unlock);
+	};
+	document.addEventListener('click', unlock);
+	document.addEventListener('touchstart', unlock);
+})();
+
 const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"ensureCrossOriginIsolationHeaders":true,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":22787504,"index.wasm":43699190},"focusCanvas":true,"gdextensionLibs":[],"serviceWorker":"index.service.worker.js"};
 const GODOT_THREADS_ENABLED = false;
 const engine = new Engine(GODOT_CONFIG);
